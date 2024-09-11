@@ -39,6 +39,7 @@ const innerSearch = computed({
 <style scoped lang="sass">
 .search
   position: relative
+  width: 100%
   &__input
     width: 100%
     padding: 10px 40px 10px 10px
