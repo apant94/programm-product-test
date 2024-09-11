@@ -40,6 +40,8 @@ const props = defineProps({
 		-webkit-box-orient: vertical
 		line-clamp: 2
 		box-orient: vertical
+		@media screen and (max-width: 768px)
+			font-size: 14px
 	&__text
 		overflow: hidden
 		text-overflow: ellipsis
@@ -50,4 +52,6 @@ const props = defineProps({
 		-webkit-box-orient: vertical
 		line-clamp: 3
 		box-orient: vertical
+		@media screen and (max-width: 768px)
+			font-size: 12px
 </style>
