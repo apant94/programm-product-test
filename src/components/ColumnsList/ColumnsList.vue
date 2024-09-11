@@ -125,13 +125,13 @@ onMounted(() => {
     &_size
       &_xl
         position: sticky
-        top: 103px
+        top: 113px
         display: flex
         flex-direction: column
         gap: 16px
         padding: 0 0 0 20px
         overflow-y: auto
-        max-height: calc(100vh - 103px)
+        max-height: calc(100vh - 113px)
         -ms-overflow-style: none
         scrollbar-width: none
         &::-webkit-scrollbar
@@ -152,7 +152,7 @@ onMounted(() => {
       font-size: 12px
   &__action
     position: sticky
-    top: 103px
+    top: 113px
     display: flex
     justify-content: center
     font-size: 20px

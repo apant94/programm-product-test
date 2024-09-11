@@ -15,7 +15,7 @@ import MorphBlob from '@/components/MorphBlob/MorphBlob.vue'
 $header-font-family: 'PressStart2P', Arial, Helvetica, sans-serif
 
 .header
-  padding-top: 20px
+  padding: 20px 0 30px
   font-family: $header-font-family
   position: sticky
   top: 0
@@ -26,10 +26,11 @@ $header-font-family: 'PressStart2P', Arial, Helvetica, sans-serif
   &__wrapper
     width: 90%
     max-width: 1280px
-    margin: 0 auto 20px
+    margin: 0 auto
     display: flex
     gap: 20px
     align-items: center
+    justify-content: center
   &__title
     font-size: 26px
     line-height: 1.2
