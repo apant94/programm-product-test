@@ -1,6 +1,7 @@
 # programm-product-test
 
-Тестовое задание для компании Программный продукт на Vue3
+Тестовое задание для компании Программный продукт на Vue3  
+
 <img width="1728" alt="Screenshot 2024-09-11 at 23 08 19" src="https://github.com/user-attachments/assets/57c1c15a-a859-4368-b183-6881f01cf83d">
 
 ## Ссылки:
