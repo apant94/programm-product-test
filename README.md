@@ -1,39 +1,32 @@
 # programm-product-test
 
-This template should help get you started developing with Vue 3 in Vite.
+Тестовое задание для компании Программный продукт на Vue3
 
-## Recommended IDE Setup
+## Ссылки:
 
-[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
+- [Сайт](https://celebrated-sable-fbafac.netlify.app/)
 
-## Type Support for `.vue` Imports in TS
+## Функционал:
 
-TypeScript cannot handle type information for `.vue` imports by default, so we replace the `tsc` CLI with `vue-tsc` for type checking. In editors, we need [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) to make the TypeScript language service aware of `.vue` types.
+- Адаптивная, резиновая верстка
+- Перемещение постов при помощи vue-draggable
+- Фильтрация данных при вводе в строку поиска
+- Оптимизация http запросов при помощи debounce
+- Пагинация
+- Сохранение порядка постов и выбранной страницы в localstorage
+- Анимация
 
-## Customize configuration
+## Планы по улучшению:
 
-See [Vite Configuration Reference](https://vitejs.dev/config/).
+- Добавить возможность сворачивания колонки
 
-## Project Setup
+## Технологии:
 
-```sh
-npm install
-```
+- HTML5
+- Sass
+- Vue3
 
-### Compile and Hot-Reload for Development
+## Инструкция:
 
-```sh
-npm run dev
-```
-
-### Type-Check, Compile and Minify for Production
-
-```sh
-npm run build
-```
-
-### Lint with [ESLint](https://eslint.org/)
-
-```sh
-npm run lint
-```
+- npm run dev (Запускает dev-server)
+- npm run build (Собирает проект в режиме разработки)
