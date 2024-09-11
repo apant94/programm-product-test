@@ -12,4 +12,7 @@ import ColumnsList from '@/components/ColumnsList/ColumnsList.vue'
 .main
   display: flex
   gap: 10px
+  width: 90%
+  max-width: 1280px
+  margin: 0 auto 20px
 </style>
