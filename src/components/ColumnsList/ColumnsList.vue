@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted, watch } from 'vue'
+import { ref, onMounted, watch, computed } from 'vue'
 import Draggable from 'vuedraggable'
 import { useApiClient } from '@/api/api-client'
 import { API_BASE_URL } from '@/constants/constants'
@@ -7,6 +7,7 @@ import { debounce } from '@/helpers'
 import PostItem from '@/components/PostItem/PostItem.vue'
 import Search from '@/components/Search/Search.vue'
 import Loader from '@/components/Loader/Loader.vue'
+import Pagination from '../Pagination/Pagination.vue'
 import type { Post } from '@/interfaces/post.intefrace'
 
 const apiBaseUrl = API_BASE_URL
@@ -15,12 +16,38 @@ const apiCLient = useApiClient(apiBaseUrl)
 const allPosts = ref<Post[]>([])
 const filteredPosts = ref<Post[]>([])
 const pickedPosts = ref<Post[]>([])
+const paginatedPosts = ref<Post[]>([])
 const loading = ref<boolean>(true)
 const loadingFilter = ref<boolean>(false)
 const searchInput = ref<string>('')
+const selectedPage = ref<number>(0)
+const pagesTotal = computed<number>(() => {
+  return Math.ceil(filteredPosts.value.length / 10)
+})
+
+const paginatePosts = () => {
+  const start = selectedPage.value * 10
+  const end = selectedPage.value * 10 + 10
+  paginatedPosts.value = filteredPosts.value.slice(start, end)
+}
+
+const handleChangeFiltered = (evt) => {
+  if (evt.removed) {
+    filteredPosts.value.splice(selectedPage.value * 10 + evt.removed.oldIndex, 1)
+  }
+  if (evt.added) {
+    filteredPosts.value.splice(selectedPage.value * 10 + evt.added.newIndex, 0, evt.added.element)
+  }
+  if (evt.moved) {
+    filteredPosts.value.splice(selectedPage.value * 10 + evt.moved.oldIndex, 1)
+    filteredPosts.value.splice(selectedPage.value * 10 + evt.moved.newIndex, 0, evt.moved.element)
+  }
+  paginatePosts()
+}
 
 const handleChangeOrder = () => {
-  console.log(pickedPosts.value)
+  // TODO send to LocalStorage
+  console.log(filteredPosts.value.length)
 }
 
 const loadAllPosts = async () => {
@@ -29,6 +56,7 @@ const loadAllPosts = async () => {
     .then((data) => {
       allPosts.value = data
       filteredPosts.value = data
+      paginatedPosts.value = filteredPosts.value.slice(0, 10)
     })
     .finally(() => (loading.value = false))
 }
@@ -36,7 +64,11 @@ const loadAllPosts = async () => {
 const loadPostsByQuery = async (query: string) => {
   await apiCLient
     .getFilteredPosts(query)
-    .then((data) => (filteredPosts.value = data))
+    .then((data) => {
+      filteredPosts.value = data
+      paginatedPosts.value = filteredPosts.value.slice(0, 10)
+      selectedPage.value = 0
+    })
     .finally(() => (loadingFilter.value = false))
 }
 
@@ -49,6 +81,16 @@ watch(searchInput, (newValue) => {
   debouncedLoadPostsByQuery(newValue)
 })
 
+watch(selectedPage, (newPage) => {
+  paginatePosts()
+})
+
+watch(pagesTotal, (newTotal) => {
+  if (selectedPage.value >= newTotal) {
+    selectedPage.value = selectedPage.value - 1
+  }
+})
+
 onMounted(() => {
   loadAllPosts()
 })
@@ -58,16 +100,26 @@ onMounted(() => {
   <div v-if="!loading" class="columns">
     <section class="columns__item">
       <Search v-model="searchInput" :loading="loadingFilter" />
+      <Pagination
+        v-if="pagesTotal > 1"
+        :pages="pagesTotal"
+        :selected-page="selectedPage"
+        class="columns__pagination"
+        @change="(number) => (selectedPage = number)"
+      />
+      <p v-if="filteredPosts.length === 0" class="columns__warning">
+        Oops! Таких постов нет. Введите другой запрос в поиске.
+      </p>
       <Draggable
         v-if="filteredPosts.length > 0"
-        :list="filteredPosts"
+        :list="paginatedPosts"
         class="columns__posts"
         tag="ul"
         :animation="300"
         :item-key="(item: Post) => item.id"
         group="posts"
         ghost-class="columns__posts-ghost"
-        @end="handleChangeOrder"
+        @change="handleChangeFiltered"
       >
         <template #item="{ element, index }">
           <li :key="index" class="columns__post">
@@ -75,9 +127,6 @@ onMounted(() => {
           </li>
         </template>
       </Draggable>
-      <div v-if="filteredPosts.length === 0" class="columns__warning">
-        Oops! Таких постов нет. Введите другой запрос в поиске.
-      </div>
     </section>
     <section class="columns__item_size_xl">
       <p v-if="pickedPosts.length === 0" class="columns__action">Перенесите пост сюда</p>
@@ -89,7 +138,7 @@ onMounted(() => {
         group="posts"
         :item-key="(item: Post) => item.id"
         ghost-class="columns__posts-ghost"
-        @end="handleChangeOrder"
+        @change="handleChangeOrder"
       >
         <template #item="{ element, index }">
           <li :key="index" class="columns__post">
@@ -110,13 +159,18 @@ onMounted(() => {
   &__item
     display: flex
     flex-direction: column
+    align-items: center
     gap: 16px
     width: 25%
     padding: 0 20px 0 0
     border-right: 1px solid
     &_size
       &_xl
-        width: calc(100% - 25% - 20px)
+        width: 75%
+  &__pagination
+    position: absolute
+    top: 90px
+    left: 20px
   &__posts
     display: flex
     flex-direction: column
@@ -125,13 +179,13 @@ onMounted(() => {
     &_size
       &_xl
         position: sticky
-        top: 113px
+        top: 90px
         display: flex
         flex-direction: column
         gap: 16px
         padding: 0 0 0 20px
         overflow-y: auto
-        max-height: calc(100vh - 113px)
+        max-height: calc(100vh - 90px)
         -ms-overflow-style: none
         scrollbar-width: none
         &::-webkit-scrollbar
@@ -152,7 +206,7 @@ onMounted(() => {
       font-size: 12px
   &__action
     position: sticky
-    top: 113px
+    top: 90px
     display: flex
     justify-content: center
     font-size: 20px

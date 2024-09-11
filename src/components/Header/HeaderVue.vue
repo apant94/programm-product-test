@@ -6,7 +6,7 @@ import MorphBlob from '@/components/MorphBlob/MorphBlob.vue'
   <header class="header">
     <div class="header__wrapper">
       <MorphBlob />
-      <h1 class="header__title">Тестовое задание для Программного продукта</h1>
+      <h1 class="header__title">Программный продукт</h1>
     </div>
   </header>
 </template>
@@ -21,8 +21,6 @@ $header-font-family: 'PressStart2P', Arial, Helvetica, sans-serif
   top: 0
   background-color: #181818
   z-index: 2
-  @media screen and (max-width: 768px)
-    justify-content: center
   &__wrapper
     width: 90%
     max-width: 1280px
@@ -30,7 +28,8 @@ $header-font-family: 'PressStart2P', Arial, Helvetica, sans-serif
     display: flex
     gap: 20px
     align-items: center
-    justify-content: center
+    @media screen and (max-width: 768px)
+      justify-content: center
   &__title
     font-size: 26px
     line-height: 1.2
