@@ -46,6 +46,8 @@ const innerSearch = computed({
     border: 1px solid #3f5efb
     border-radius: 6px
     color: rgba(235, 235, 235, 0.64)
+    &:focus-visible
+      outline: none
   &__loader
     position: absolute
     top: calc(50% - 10px)
