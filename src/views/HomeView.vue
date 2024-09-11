@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import Columns from '@/components/Columns/Columns.vue'
+import ColumnsList from '@/components/ColumnsList/ColumnsList.vue'
 </script>
 
 <template>
   <main class="main">
-    <Columns />
+    <ColumnsList />
   </main>
 </template>
 
