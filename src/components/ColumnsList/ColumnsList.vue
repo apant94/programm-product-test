@@ -62,21 +62,32 @@ const loadAllPosts = async () => {
 }
 
 const deletePickerPosts = (posts: Post[]) => {
-  const result: Post[] = posts.filter(
-    (ar) => !pickedPosts.value.find((rm) => rm.id === ar.id && ar.userId === rm.userId)
-  )
+  const result: Post[] =
+    pickedPosts.value.length > 0
+      ? posts.filter(
+          (ar) => !pickedPosts.value.find((rm) => rm.id === ar.id && ar.userId === rm.userId)
+        )
+      : posts
   return result
 }
 
 const loadPostsByQuery = async (query: string) => {
-  await apiCLient
-    .getFilteredPosts(query)
-    .then((data) => {
-      filteredPosts.value = deletePickerPosts(data)
-      paginatedPosts.value = filteredPosts.value.slice(0, 10)
-      selectedPage.value = 0
-    })
-    .finally(() => (loadingFilter.value = false))
+  const setCurrentPosts = (data: Post[]) => {
+    filteredPosts.value = deletePickerPosts(data)
+    paginatedPosts.value = filteredPosts.value.slice(0, 10)
+    selectedPage.value = 0
+  }
+  if (query !== '') {
+    await apiCLient
+      .getFilteredPosts(query)
+      .then((data) => {
+        setCurrentPosts(data)
+      })
+      .finally(() => (loadingFilter.value = false))
+  } else {
+    loadingFilter.value = false
+    setCurrentPosts(allPosts.value)
+  }
 }
 
 const debouncedLoadPostsByQuery = debounce((query) => {
@@ -115,7 +126,6 @@ onMounted(() => {
         :list="paginatedPosts"
         class="columns__posts"
         tag="ul"
-        :animation="300"
         :item-key="(item: Post) => item.id"
         group="posts"
         ghost-class="columns__posts-ghost"
@@ -131,7 +141,6 @@ onMounted(() => {
         v-if="pagesTotal > 1"
         :pages="pagesTotal"
         :selected-page="selectedPage"
-        class="columns__pagination"
         @change="(number) => (selectedPage = number)"
       />
     </section>
@@ -141,7 +150,6 @@ onMounted(() => {
         :list="pickedPosts"
         class="columns__posts_size_xl"
         tag="ul"
-        :animation="300"
         group="posts"
         :item-key="(item: Post) => item.id"
         ghost-class="columns__posts-ghost"
@@ -172,14 +180,14 @@ onMounted(() => {
     width: 25%
     padding: 0 20px 0 0
     border-right: 1px solid
+    @media screen and (max-width: 768px)
+      width: 50%
+      padding: 0 10px 0 0
     &_size
       &_xl
         width: 75%
-  &__pagination
-    // position: absolute
-    // top: 0
-    // transform: translateX(-100%)
-    // left: -20px
+        @media screen and (max-width: 768px)
+          width: 50%
   &__posts
     display: flex
     flex-direction: column
@@ -199,6 +207,10 @@ onMounted(() => {
         scrollbar-width: none
         &::-webkit-scrollbar
           display: none
+        @media screen and (max-width: 768px)
+          padding: 0 0 0 10px
+          top: 110px
+          max-height: calc(100dvh - 110px)
   &__post
     list-style: none
   &__posts-ghost

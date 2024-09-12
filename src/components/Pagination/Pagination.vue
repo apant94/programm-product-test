@@ -47,6 +47,9 @@ const emit = defineEmits(['change'])
 		&_active
 			background: #3f5efb
 			width: 38px
+			&:hover
+				background: #3f5efb
+				width: 38px
 	&__btn
 		display: inline-block
 		visibility: hidden
