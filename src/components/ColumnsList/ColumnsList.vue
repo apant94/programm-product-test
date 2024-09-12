@@ -107,13 +107,6 @@ onMounted(() => {
   <div v-if="!loading" class="columns">
     <section class="columns__item">
       <Search v-model="searchInput" :loading="loadingFilter" />
-      <Pagination
-        v-if="pagesTotal > 1"
-        :pages="pagesTotal"
-        :selected-page="selectedPage"
-        class="columns__pagination"
-        @change="(number) => (selectedPage = number)"
-      />
       <p v-if="filteredPosts.length === 0" class="columns__warning">
         Oops! Таких постов нет. Введите другой запрос в поиске.
       </p>
@@ -134,6 +127,13 @@ onMounted(() => {
           </li>
         </template>
       </Draggable>
+      <Pagination
+        v-if="pagesTotal > 1"
+        :pages="pagesTotal"
+        :selected-page="selectedPage"
+        class="columns__pagination"
+        @change="(number) => (selectedPage = number)"
+      />
     </section>
     <section class="columns__item_size_xl">
       <p v-if="pickedPosts.length === 0" class="columns__action">Перенесите пост сюда</p>
