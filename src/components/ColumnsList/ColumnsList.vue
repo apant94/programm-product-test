@@ -61,11 +61,18 @@ const loadAllPosts = async () => {
     .finally(() => (loading.value = false))
 }
 
+const deletePickerPosts = (posts: Post[]) => {
+  const result: Post[] = posts.filter(
+    (ar) => !pickedPosts.value.find((rm) => rm.id === ar.id && ar.userId === rm.userId)
+  )
+  return result
+}
+
 const loadPostsByQuery = async (query: string) => {
   await apiCLient
     .getFilteredPosts(query)
     .then((data) => {
-      filteredPosts.value = data
+      filteredPosts.value = deletePickerPosts(data)
       paginatedPosts.value = filteredPosts.value.slice(0, 10)
       selectedPage.value = 0
     })
@@ -157,6 +164,7 @@ onMounted(() => {
   height: 100%
   width: 100%
   &__item
+    position: relative
     display: flex
     flex-direction: column
     align-items: center
@@ -168,9 +176,10 @@ onMounted(() => {
       &_xl
         width: 75%
   &__pagination
-    position: absolute
-    top: 90px
-    left: 20px
+    // position: absolute
+    // top: 0
+    // transform: translateX(-100%)
+    // left: -20px
   &__posts
     display: flex
     flex-direction: column
