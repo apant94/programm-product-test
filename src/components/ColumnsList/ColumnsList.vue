@@ -3,7 +3,7 @@ import { ref, onMounted, watch, computed } from 'vue'
 import Draggable from 'vuedraggable'
 import { useApiClient } from '@/api/api-client'
 import { API_BASE_URL } from '@/constants/constants'
-import { debounce } from '@/helpers'
+import { debounce, getLocalStorage, setLocalStorage, deleteStorage } from '@/helpers'
 import PostItem from '@/components/PostItem/PostItem.vue'
 import Search from '@/components/Search/Search.vue'
 import Loader from '@/components/Loader/Loader.vue'
@@ -17,9 +17,11 @@ const allPosts = ref<Post[]>([])
 const filteredPosts = ref<Post[]>([])
 const pickedPosts = ref<Post[]>([])
 const paginatedPosts = ref<Post[]>([])
-const loading = ref<boolean>(true)
+const loading = ref<boolean>(false)
 const loadingFilter = ref<boolean>(false)
-const searchInput = ref<string>('')
+const searchInput = ref<string>(
+  getLocalStorage('programm_search_query') ? getLocalStorage('programm_search_query') : ''
+)
 const selectedPage = ref<number>(0)
 const pagesTotal = computed<number>(() => {
   return Math.ceil(filteredPosts.value.length / 10)
@@ -30,6 +32,7 @@ const paginatePosts = () => {
   const start = selectedPage.value * 10
   const end = selectedPage.value * 10 + 10
   paginatedPosts.value = filteredPosts.value.slice(start, end)
+  setLocalStorage('programm_paginated_posts', paginatedPosts.value)
 }
 
 const handleChangeFiltered = (evt) => {
@@ -43,23 +46,46 @@ const handleChangeFiltered = (evt) => {
     filteredPosts.value.splice(selectedPage.value * 10 + evt.moved.oldIndex, 1)
     filteredPosts.value.splice(selectedPage.value * 10 + evt.moved.newIndex, 0, evt.moved.element)
   }
+  setLocalStorage('programm_filtered_posts', filteredPosts.value)
   paginatePosts()
 }
 
 const handleChangeOrder = () => {
-  // TODO send to LocalStorage
-  console.log(filteredPosts.value.length)
+  setLocalStorage('programm_picked_posts', pickedPosts.value)
 }
 
 const loadAllPosts = async () => {
-  await apiCLient
-    .getPosts()
-    .then((data) => {
-      allPosts.value = data
-      filteredPosts.value = data
-      paginatedPosts.value = filteredPosts.value.slice(0, 10)
-    })
-    .finally(() => (loading.value = false))
+  const storagedAllPosts = getLocalStorage('programm_all_posts')
+  const storagedFilteredPosts = getLocalStorage('programm_filtered_posts')
+  const storagedPaginatedPosts = getLocalStorage('programm_paginated_posts')
+  const storagedSelectedPage = getLocalStorage('programm_selected_page')
+  const storagedPickesPosts = getLocalStorage('programm_picked_posts')
+  // const storagedSearchQuery = getLocalStorage('programm_search_query')
+
+  if (storagedAllPosts && storagedFilteredPosts && storagedPaginatedPosts) {
+    allPosts.value = storagedAllPosts
+    filteredPosts.value = storagedFilteredPosts
+    paginatedPosts.value = storagedPaginatedPosts
+    selectedPage.value = storagedSelectedPage
+    pickedPosts.value = storagedPickesPosts || []
+    // if (storagedSearchQuery) searchInput.value = storagedSearchQuery
+  } else {
+    loading.value = true
+    await apiCLient
+      .getPosts()
+      .then((data) => {
+        allPosts.value = data
+        filteredPosts.value = data
+        paginatedPosts.value = filteredPosts.value.slice(0, 10)
+      })
+      .then(() => {
+        setLocalStorage('programm_all_posts', allPosts.value)
+        setLocalStorage('programm_filtered_posts', filteredPosts.value)
+        setLocalStorage('programm_paginated_posts', paginatedPosts.value)
+        setLocalStorage('programm_selected_page', selectedPage.value)
+      })
+      .finally(() => (loading.value = false))
+  }
 }
 
 const deletePickerPosts = (posts: Post[]) => {
@@ -77,6 +103,9 @@ const loadPostsByQuery = async (query: string) => {
     filteredPosts.value = deletePickerPosts(data)
     paginatedPosts.value = filteredPosts.value.slice(0, 10)
     selectedPage.value = 0
+    setLocalStorage('programm_filtered_posts', filteredPosts.value)
+    setLocalStorage('programm_paginated_posts', paginatedPosts.value)
+    setLocalStorage('programm_selected_page', selectedPage.value)
   }
   if (query !== '') {
     await apiCLient
@@ -97,16 +126,23 @@ const debouncedLoadPostsByQuery = debounce((query) => {
 
 watch(searchInput, (newValue) => {
   loadingFilter.value = true
+  if (newValue) {
+    setLocalStorage('programm_search_query', newValue)
+  } else {
+    deleteStorage('programm_search_query')
+  }
   debouncedLoadPostsByQuery(newValue)
 })
 
 watch(selectedPage, (newPage) => {
+  setLocalStorage('programm_selected_page', selectedPage.value)
   paginatePosts()
 })
 
 watch(pagesTotal, (newTotal) => {
   if (selectedPage.value >= newTotal) {
     selectedPage.value = selectedPage.value - 1
+    setLocalStorage('programm_selected_page', selectedPage.value)
   }
 })
 

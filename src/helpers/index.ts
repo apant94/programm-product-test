@@ -1,3 +1,4 @@
 import { debounce } from './debounce'
+import { getLocalStorage, setLocalStorage, deleteStorage } from './checkLocalStorage'
 
-export { debounce }
+export { debounce, getLocalStorage, setLocalStorage, deleteStorage }
