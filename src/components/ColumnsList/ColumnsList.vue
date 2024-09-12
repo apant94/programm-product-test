@@ -60,7 +60,6 @@ const loadAllPosts = async () => {
   const storagedPaginatedPosts = getLocalStorage('programm_paginated_posts')
   const storagedSelectedPage = getLocalStorage('programm_selected_page')
   const storagedPickesPosts = getLocalStorage('programm_picked_posts')
-  // const storagedSearchQuery = getLocalStorage('programm_search_query')
 
   if (storagedAllPosts && storagedFilteredPosts && storagedPaginatedPosts) {
     allPosts.value = storagedAllPosts
@@ -68,7 +67,6 @@ const loadAllPosts = async () => {
     paginatedPosts.value = storagedPaginatedPosts
     selectedPage.value = storagedSelectedPage
     pickedPosts.value = storagedPickesPosts || []
-    // if (storagedSearchQuery) searchInput.value = storagedSearchQuery
   } else {
     loading.value = true
     await apiCLient
