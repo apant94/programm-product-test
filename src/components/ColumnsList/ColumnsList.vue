@@ -26,6 +26,7 @@ const pagesTotal = computed<number>(() => {
 })
 
 const paginatePosts = () => {
+  if (selectedPage.value < 0) selectedPage.value = 0
   const start = selectedPage.value * 10
   const end = selectedPage.value * 10 + 10
   paginatedPosts.value = filteredPosts.value.slice(start, end)
@@ -122,9 +123,9 @@ onMounted(() => {
         Oops! Таких постов нет. Введите другой запрос в поиске.
       </p>
       <Draggable
-        v-if="filteredPosts.length > 0"
         :list="paginatedPosts"
         class="columns__posts"
+        :class="{ columns__posts_empty: filteredPosts.length === 0 }"
         tag="ul"
         :item-key="(item: Post) => item.id"
         group="posts"
@@ -193,8 +194,15 @@ onMounted(() => {
     flex-direction: column
     gap: 16px
     padding: 0
+    min-height: 80dvh
+    @media screen and (max-width: 768px)
+      min-height: calc(100dvh - 110px)
+    &_empty
+      width: 100%
+      min-height: 60dvh
     &_size
       &_xl
+        min-height: 80dvh
         position: sticky
         top: 90px
         display: flex
@@ -210,7 +218,7 @@ onMounted(() => {
         @media screen and (max-width: 768px)
           padding: 0 0 0 10px
           top: 110px
-          max-height: calc(100dvh - 110px)
+          min-height: calc(100dvh - 110px)
   &__post
     list-style: none
   &__posts-ghost

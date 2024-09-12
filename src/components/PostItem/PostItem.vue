@@ -30,6 +30,8 @@ const props = defineProps({
 	transition: all .2s linear
 	&:hover
 		transform: scale(0.97)
+	@media screen and (max-width: 768px)
+		padding: 10px
 	&__title
 		overflow: hidden
 		text-overflow: ellipsis
